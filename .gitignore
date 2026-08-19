@@ -16,6 +16,13 @@ __pycache__/
 .ruff_cache/
 .coverage
 htmlcov/
+build/
+*.egg-info/
+
+# Local reference/test databases (no tracked database file exists in this repository)
+*.db
+*.sqlite
+*.sqlite3
 
 # Node.js
 node_modules/

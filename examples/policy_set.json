@@ -1,0 +1,11 @@
+{
+  "policy_set_id": "arb-reference-policies",
+  "policies": [
+    {
+      "policy_type": "capability_boundary",
+      "policy_id": "deny-execute-capabilities",
+      "description": "deny any EXECUTE-mode capability invocation during review",
+      "denied_modes": ["execute"]
+    }
+  ]
+}

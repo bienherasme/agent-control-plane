@@ -1,0 +1,41 @@
+{
+  "expectation_set_id": "arb-reference-expectations",
+  "expectations": [
+    {
+      "expectation_type": "execution_status",
+      "expectation_id": "execution-completed",
+      "description": "the execution must reach a completed lifecycle status",
+      "acceptable_statuses": ["completed"]
+    },
+    {
+      "expectation_type": "execution_outcome",
+      "expectation_id": "outcome-request-changes",
+      "description": "the review outcome must be request_changes",
+      "acceptable_outcomes": ["request_changes"]
+    },
+    {
+      "expectation_type": "step_occurrence",
+      "expectation_id": "five-specialist-reviews",
+      "description": "exactly five model specialist steps must run",
+      "kind": "model",
+      "min_occurrences": 5,
+      "max_occurrences": 5
+    },
+    {
+      "expectation_type": "capability_occurrence",
+      "expectation_id": "no-execute-capabilities",
+      "description": "no EXECUTE-mode capability invocation is expected during review",
+      "modes": ["execute"],
+      "min_occurrences": 0,
+      "max_occurrences": 0
+    },
+    {
+      "expectation_type": "step_occurrence",
+      "expectation_id": "single-supervisor-decision",
+      "description": "exactly one supervisor decision step must run",
+      "kind": "decision",
+      "min_occurrences": 1,
+      "max_occurrences": 1
+    }
+  ]
+}

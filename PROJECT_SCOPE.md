@@ -1,62 +1,108 @@
-# Agent Control Plane
+# Project Scope
 
-## Purpose
+## Product responsibility
 
-Agent Control Plane is an observability and evaluation system for AI and agentic applications.
+Agent Control Plane is a provider-neutral execution observability, governance, evaluation, and
+regression control plane for AI-assisted software workflows.
 
-The goal is to make agent execution measurable by capturing workflow traces, model calls, tool usage, failures, latency, token usage, cost signals, and evaluation results.
+It records typed execution events from external AI systems, reconstructs deterministic execution
+state from that history, and provides a stable control plane for:
 
-## Initial Scope
+- execution trace representation
+- bounded operational metadata
+- capability/action visibility
+- policy evaluation
+- evaluation results
+- governance decisions
+- regression/comparison
 
-The first version will focus on:
+It does not own the business workflow being observed. The observed system remains authoritative
+for its own domain; the control plane observes and evaluates execution behavior without taking
+ownership of it.
 
-- agent run tracking
-- workflow traces
-- LLM call metadata
-- tool invocation metadata
-- latency
-- token usage
-- model usage
-- retries
-- tool failures
-- workflow outcomes
-- evaluation datasets
-- regression detection
+Examples of future producers: incident coordination systems, architecture review systems,
+engineering assistants, and other bounded AI workflows. The control plane does not depend on any
+of them.
 
-## Architecture Direction
+## It is not
 
-Instrumentation should be independent from the applications being observed.
+Agent Control Plane is not:
 
-Applications emit structured execution events to the control plane, which stores and analyzes them without becoming part of the application's business logic.
+- an AI agent framework
+- an LLM gateway
+- a prompt management platform
+- a chatbot
+- an orchestration framework
+- a generic workflow engine
+- a model router
+- a tracing UI
+- an OpenTelemetry replacement
+- a SIEM
+- an autonomous governance agent
+- a billing system
+- an enterprise observability replacement
+- an LLMOps platform
+- a full distributed tracing system
 
-The design should support several independent agentic applications rather than being coupled to one workflow.
+## v0.1.0 scope
 
-## Design Principles
+In scope for this version:
 
-- structured telemetry
-- low coupling to observed applications
-- trace correlation
-- measurable success criteria
-- regression-oriented evaluation
-- model and tool visibility
-- cost and latency awareness
-- no storage of secrets or unnecessary prompt content
+- typed, immutable execution snapshots
+- append-only typed execution events, with deterministic projection into a snapshot
+- exact event idempotency and safe producer retry
+- hierarchical execution steps
+- model invocation visibility
+- external capability/action visibility
+- human approval visibility
+- explicit failure representation
+- execution outcome
+- explicit producer instrumentation boundary (session, client, sink contract)
+- deterministic, observational governance policy evaluation over observed execution facts
+- deterministic execution evaluation against declared expectations
+- baseline/candidate execution regression comparison
+- durable append-only local event storage with a SQLite reference adapter
+- deterministic execution query/reporting over durable event history
+- local CLI (ingest, list, report, compare)
+- a deterministic reference producer example and scenario
 
-## Out of Scope Initially
+Out of scope entirely:
 
-- automatic production remediation
-- full APM replacement
-- infrastructure monitoring
-- model training
-- prompt management platform
-- enterprise billing
-- multi-tenant SaaS administration
-- automatic replacement of human evaluation
+- agent orchestration
+- workflow execution
+- prompt authoring or storage
+- model routing
+- raw prompt/response capture or tracing
+- autonomous enforcement or remediation
+- automatic deployment
+- generic observability backend
+- OpenTelemetry replacement
+- distributed tracing backend
+- HTTP service
+- MCP server
+- UI/dashboard
+- multi-tenant authorization
+- billing
+- secrets management
+- ticketing
+- distributed database
+- automatic baseline selection
+- statistical benchmark or trend analysis
 
-## Relationship to Other Personal Projects
+## Core architectural principle
 
-This system is intended to observe independent AI systems such as incident-response workflows, retrieval systems, MCP servers, and multi-agent architecture analysis.
+The domain models execution semantics, not agent conversations. There is no `AgentMessage`,
+`Conversation`, `ChatTurn`, `AgentMemory`, `Scratchpad`, `AssistantMessage`, or `UserMessage`
+concept, and none should be added unless a concrete future requirement proves one necessary.
 
-## Project Origin
+The control plane understands executions, steps, model invocations, external capability calls,
+human approval, outcomes, and failures, without requiring conversational state.
 
-This project concept and its initial scope were defined before the start of my next employment engagement.
+## Events are the durable source of truth
+
+`ExecutionRecord` is a validated execution snapshot. It is not persisted and it is not the
+durable source of truth: the append-only `ExecutionEventStream` is. `project_execution` folds
+that history deterministically into a snapshot on demand, and `GovernanceReport`,
+`EvaluationReport`, and `ExecutionComparison` are all likewise derived, on demand, from event
+history plus explicit trusted configuration. None of them are separately authoritative persisted
+state.
